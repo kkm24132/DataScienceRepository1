@@ -167,3 +167,67 @@ CREATE TABLE ATM_ICBC.AVAILABILITY (
 --CREATE UNIQUE INDEX ATM_ICBC.IDCOMPONENT_IDX
 --                 ON ATM_ICBC.AVAILABILITY (IDCOMPONENT); -- The unique index is disabled for data load and not used
 
+
+---------------------------------------------------------------------------------------------------------------------
+-- Create table scripts for Monitoring related information (STATUS, DISPOSITION, MONITORING)
+---------------------------------------------------------------------------------------------------------------------
+-- Table Name: ATM_ICBC.STATUS
+-- Create table definitions for STATUS table which contains Event/Error codes and description (i.e. Error Dictionary data)
+CREATE TABLE ATM_ICBC.STATUS (
+	                       IDSTATUS         INT           NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                      ,STATUS           VARCHAR(45)   NOT NULL
+	                      ,COMMENT          VARCHAR(100)  NULL
+	                      ,PRIMARY KEY (IDSTATUS)
+);
+CREATE UNIQUE INDEX ATM_ICBC.STATUS_IDX
+                 ON ATM_ICBC.STATUS (STATUS);
+
+-- Table Name: ATM_ICBC.DISPOSITION
+-- Create table definitions for DISPOSITION table, No data loaded yet, not required from modeling standpoint for ICBC at the moment
+CREATE TABLE ATM_ICBC.DISPOSITION (
+	                            IDDISPOSITION        INT           NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                           ,DISPOSITION          VARCHAR(45)   NOT NULL
+	                           ,COMMENT              VARCHAR(100)  NULL
+	                           ,PRIMARY KEY (IDDISPOSITION)
+);
+CREATE UNIQUE INDEX ATM_ICBC.DISPOSITION_IDX
+                 ON ATM_ICBC.DISPOSITION (DISPOSITION);
+
+-- Table Name: ATM_ICBC.MONITORING
+-- Create table definitions for MONITORING table, that is Error / Event information
+CREATE TABLE ATM_ICBC.MONITORING (
+	                           IDMONITORING         INT        NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                          ,IDASSET              INT        NOT NULL
+	                          ,IDCOMPONENT          INT        NULL      -- changed from NOT NULL to NULL
+	                          ,IDDISPOSITION        INT        NULL      -- changed from NOT NULL to NULL
+	                          ,IDSTATUS             INT        NOT NULL
+	                          ,DATE                 TIMESTAMP  NOT NULL
+	                          ,PRIMARY KEY (IDMONITORING)
+	                          ,CONSTRAINT IDASSET FOREIGN KEY (IDASSET) 
+	                                               REFERENCES ATM_ICBC.ASSET(IDASSET) 
+	                                                ON DELETE NO ACTION 
+	                                                ON UPDATE NO ACTION
+--	                          ,CONSTRAINT IDCOMPONENT FOREIGN KEY (IDCOMPONENT) 
+--	                                               REFERENCES ATM_ICBC.COMPONENT(IDCOMPONENT) 
+--	                                                ON DELETE NO ACTION 
+--	                                                ON UPDATE NO ACTION
+	                          ,CONSTRAINT IDSTATUS FOREIGN KEY (IDSTATUS) 
+	                                                REFERENCES ATM_ICBC.STATUS (IDSTATUS) 
+	                                                 ON DELETE NO ACTION 
+	                                                 ON UPDATE NO ACTION
+--	                          ,CONSTRAINT IDDISPOSITION FOREIGN KEY (IDDISPOSITION) 
+--	                                               REFERENCES ATM_ICBC.DISPOSITION(IDDISPOSITION) 
+--	                                                ON DELETE NO ACTION 
+--	                                                ON UPDATE NO ACTION
+);
+CREATE UNIQUE INDEX ATM_ICBC.IDASSET_IDX
+                 ON ATM_ICBC.MONITORING (IDASSET);
+CREATE UNIQUE INDEX ATM_ICBC.IDSTATUS_IDX
+                 ON ATM_ICBC.MONITORING (IDSTATUS);
+--CREATE UNIQUE INDEX ATM_ICBC.IDCOMPONENT_IDX
+--                 ON ATM_ICBC.MONITORING (IDCOMPONENT); -- The unique index is disabled for data load and not used
+--CREATE UNIQUE INDEX ATM_ICBC.IDDISPOSITION_IDX
+--                 ON ATM_ICBC.MONITORING (IDDISPOSITION); -- The unique index is disabled for data load and not used
+
+	
+
