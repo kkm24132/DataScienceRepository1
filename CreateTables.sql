@@ -229,5 +229,45 @@ CREATE UNIQUE INDEX ATM_ICBC.IDSTATUS_IDX
 --CREATE UNIQUE INDEX ATM_ICBC.IDDISPOSITION_IDX
 --                 ON ATM_ICBC.MONITORING (IDDISPOSITION); -- The unique index is disabled for data load and not used
 
-	
+
+
+---------------------------------------------------------------------------------------------------------------------
+-- Create table scripts for Transaction related information (TRANSACTION_TYPE, TRANSACTION)
+---------------------------------------------------------------------------------------------------------------------
+-- Table Name: ATM_ICBC.TRANSACTION_TYPE
+-- Create table definitions for TRANSACTION_TYPE table which contains details of different types of transactions
+-- Currently 4 types of transactions - Withdraw (Cash withdrawal), Deposit(Envelope and bunch deposits), Checks (Standard Depositor only), Non-Cash (Payments, PIN change, Inquiries etc.)
+CREATE TABLE ATM_ICBC.TRANSACTION_TYPE (
+	                                 IDTTYPE        INT           NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                                ,TTYPE          VARCHAR(45)   NOT NULL
+	                                ,COMMENT        VARCHAR(100)  NULL
+	                                ,PRIMARY KEY (IDTTYPE)
+);
+CREATE UNIQUE INDEX ATM_ICBC.TTYPE_IDX
+                 ON ATM_ICBC.TRANSACTION_TYPE (TTYPE);
+
+-- Table Name: ATM_ICBC.TRANSACTION
+-- Create table definitions for TRANSACTION table which contains daily transactions (Granularity = 1 for daily)
+CREATE TABLE ATM_ICBC.TRANSACTION (
+	                            IDTRANSACTION      INT         NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                           ,IDASSET            INT         NOT NULL            
+	                           ,IDTTYPE            INT         NOT NULL
+	                           ,DATE               TIMESTAMP   NOT NULL            -- transaction date / timestamp
+	                           ,COUNT              INT         NULL                -- transaction count, can be NULL
+	                           ,VALUE              NUMERIC     NULL                -- transaction amount, can be NULL 
+	                           ,GRANULARITY        INT         NULL     DEFAULT 1  -- e.g. 1 for daily, 7 for weekly etc, for now : default 1 for transactions aggregated at daily level
+	                           ,PRIMARY KEY (IDTRANSACTION)
+--	                           ,CONSTRAINT IDASSET FOREIGN KEY (IDASSET)           -- remove constraint while data load
+--	                                                REFERENCES ATM_ICBC.ASSET(IDASSET) 
+--	                                                 ON DELETE NO ACTION 
+--	                                                 ON UPDATE NO ACTION
+	                           ,CONSTRAINT IDTTYPE FOREIGN KEY (IDTTYPE) 
+	                                                REFERENCES ATM_ICBC.TRANSACTION_TYPE(IDTTYPE) 
+	                                                 ON DELETE NO ACTION 
+	                                                 ON UPDATE NO ACTION
+);
+--CREATE UNIQUE INDEX ATM_ICBC.IDASSET_IDX
+--                 ON ATM_ICBC.TRANSACTION (IDASSET);  --The unique index is disabled for data load and not used 
+CREATE UNIQUE INDEX ATM_ICBC.IDTTYPE_IDX
+                 ON ATM_ICBC.TRANSACTION (IDTTYPE);
 
