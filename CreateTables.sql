@@ -91,3 +91,79 @@ CREATE TABLE ATM_ICBC.ASSET (
                                             ON UPDATE no action
 );
 
+---------------------------------------------------------------------------------------------------------------------
+-- Create table scripts for Ticket, Component related information (COMPONENT, TICKET, AVAILABILITY)
+---------------------------------------------------------------------------------------------------------------------
+-- Table Name: ATM_ICBC.COMPONENT
+-- Create table definitions for COMPONENT table which contains Component / Module related information of Assets
+CREATE TABLE ATM_ICBC.COMPONENT (
+	                          IDCOMPONENT      INT           NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                         ,IDASSET          INT           NOT NULL
+	                         ,COMPONENT        VARCHAR(100)  NOT NULL
+	                         ,VERSION          VARCHAR(100)  NULL
+	                         ,PRIMARY KEY (IDCOMPONENT)
+	                         ,CONSTRAINT IDASSET FOREIGN KEY (IDASSET) 
+	                                              REFERENCES ATM_ICBC.ASSET(IDASSET) 
+	                                               ON DELETE NO ACTION 
+	                                               ON UPDATE NO ACTION
+);
+--CREATE UNIQUE INDEX ATM_ICBC.IDASSET_IDX 
+--                 ON ATM_ICBC.COMPONENT (IDASSET); -- The unique index is disabled for data load and not used
+--CREATE UNIQUE INDEX ATM_ICBC.IDASSET_COMPONENT_IDX
+--                 ON ATM_ICBC.COMPONENT (IDASSET, COMPONENT); -- The unique index is disabled for data loads and not used
+
+-- Table Name: ATM_ICBC.TICKET
+-- Create table definitions for TICKET table which contains service tickets related information 
+CREATE TABLE ATM_ICBC.TICKET (
+	                       IDTICKET          INT           NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                      ,IDASSET           INT           NOT NULL
+	                      ,IDCOMPONENT       INT           NOT NULL
+	                      ,OPENED            TIMESTAMP     NOT NULL
+	                      ,CLOSED            TIMESTAMP     NULL
+	                      ,ASSIGNED          TIMESTAMP     NULL
+	                      ,ACTION            VARCHAR(100)  NULL   -- Proposed to be added from TAR_CODE (1st digit)
+	                      ,TAR_MODULE        VARCHAR(100)  NULL   -- Proposed to be added from TAR_CODE (2nd and 3rd digits)
+	                      ,RESOLUTION        VARCHAR(100)  NULL   -- This is 4th digit in TAR_CODE which is Problem Determination or Resolution
+	                      ,DESCRIPTION       VARCHAR(100)  NULL
+	                      ,SERVICE_LEVEL     VARCHAR(45)   NULL
+	                      ,PART_REPLACED     VARCHAR(1)    NULL
+	                      ,TYPE              VARCHAR(20)   NULL
+	                      ,PRIMARY KEY (IDTICKET)
+	                      ,CONSTRAINT IDASSET FOREIGN KEY (IDASSET) 
+	                                           REFERENCES ATM_ICBC.ASSET(IDASSET) 
+	                                            ON DELETE NO ACTION 
+	                                            ON UPDATE NO ACTION
+	                      ,CONSTRAINT IDCOMPONENT FOREIGN KEY (IDCOMPONENT) 
+	                                               REFERENCES ATM_ICBC.COMPONENT(IDCOMPONENT) 
+	                                                ON DELETE NO ACTION 
+	                                                ON UPDATE NO ACTION
+);
+
+--CREATE UNIQUE INDEX ATM_ICBC.IDASSET_IDX
+--                 ON ATM_ICBC.TICKET (IDASSET); -- The unique index is disabled for data load and not used
+--CREATE UNIQUE INDEX ATM_ICBC.IDCOMPONENT_IDX
+--                 ON ATM_ICBC.TICKET (IDCOMPONENT); -- The unique index is disabled for data load and not used
+
+-- Table Name: ATM_ICBC.AVAILABILITY
+-- Create table definitions for AVAILABILITY table which contains availability related information. No data loaded yet, not required from modeling standpoint for ICBC at the moment
+CREATE TABLE ATM_ICBC.AVAILABILITY (
+	                             IDAVAILABILITY         INT        NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                            ,IDASSET                INT        NOT NULL
+	                            ,IDCOMPONENT            INT        NOT NULL
+	                            ,DAYS_TOTAL             DOUBLE     NOT NULL
+	                            ,DAYS_DOWN              DOUBLE     NOT NULL
+	                            ,PRIMARY KEY (IDAVAILABILITY)
+	                            ,CONSTRAINT IDASSET FOREIGN KEY (IDASSET) 
+	                                                 REFERENCES ATM_ICBC.ASSET(IDASSET) 
+	                                                  ON DELETE NO ACTION 
+	                                                  ON UPDATE NO ACTION
+	                            ,CONSTRAINT IDCOMPONENT FOREIGN KEY (IDCOMPONENT) 
+	                                                 REFERENCES ATM_ICBC.COMPONENT(IDCOMPONENT) 
+	                                                  ON DELETE NO ACTION 
+	                                                  ON UPDATE NO ACTION
+);
+--CREATE UNIQUE INDEX ATM_ICBC.IDASSET_IDX
+--                ON ATM_ICBC.AVAILABILITY (IDASSET); -- The unique index is disabled for data load and not used
+--CREATE UNIQUE INDEX ATM_ICBC.IDCOMPONENT_IDX
+--                 ON ATM_ICBC.AVAILABILITY (IDCOMPONENT); -- The unique index is disabled for data load and not used
+
