@@ -271,3 +271,102 @@ CREATE TABLE ATM_ICBC.TRANSACTION (
 CREATE UNIQUE INDEX ATM_ICBC.IDTTYPE_IDX
                  ON ATM_ICBC.TRANSACTION (IDTTYPE);
 
+---------------------------------------------------------------------------------------------------------------------
+-- Create table scripts for Result / Prediction related information (INTERVAL, FEATURE, EXPERIMENT, CONFIGURATION,
+-- DATASET, SELECTION, RESULT)
+---------------------------------------------------------------------------------------------------------------------
+-- Table Name: ATM_ICBC.INTERVAL
+-- Create table definitions for INTERVAL table which contains observation and prediction start and end dates for every run / round.
+CREATE TABLE ATM_ICBC.INTERVAL (
+	                         IDINTERVAL          INT    NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                        ,OBSERVE_FROM        DATE   NOT NULL
+	                        ,OBSERVE_TO          DATE   NOT NULL
+	                        ,PREDICT_FROM        DATE   NOT NULL
+	                        ,PREDICT_TO          DATE   NOT NULL
+	                        ,PRIMARY KEY (IDINTERVAL)
+);
+
+-- Table Name: ATM_ICBC.FEATURE
+-- Create table definitions for FEATURE table which will contain all features used in model development for arriving results or predictions.
+-- This is not loaded currently for ICBC
+CREATE TABLE ATM_ICBC.FEATURE (
+	                        IDFEATURE            INT            NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                       ,NAME                 VARCHAR(45)    NOT NULL
+	                       ,DESCRIPTION          VARCHAR(100)   NULL
+	                       ,PRIMARY KEY (IDFEATURE)
+);
+
+-- Table Name: ATM_ICBC.EXPERIMENT
+-- Create table definitions for EXPERIMENT table which contains information related to various model experiments and
+-- captures cutoff, precision, recall and F1-score for an experiment
+CREATE TABLE ATM_ICBC.EXPERIMENT (
+	                           IDEXPERIMENT        INT         NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)
+	                          ,PERFORMED           TIMESTAMP   NOT NULL
+	                          ,CUTOFF              DOUBLE      NULL
+	                          ,RECALL              DOUBLE      NULL
+	                          ,PRECISION           DOUBLE      NULL
+	                          ,F1_SCORE            DOUBLE      NULL
+	                          ,PRIMARY KEY (IDEXPERIMENT)
+);
+
+-- Table Name: ATM_ICBC.CONFIGURATION
+-- Create table definitions for CONFIGURATION table. This is a master table to capture module information for every interval and for every experiment.
+CREATE TABLE ATM_ICBC.CONFIGURATION (
+	                              IDEXPERIMENT        INT           NOT NULL
+	                             ,IDINTERVAL          INT           NOT NULL
+	                             ,COMPONENT           VARCHAR(45)   NOT NULL
+	                             ,CONSTRAINT IDEXPERIMENT FOREIGN KEY (IDEXPERIMENT) 
+	                                                       REFERENCES ATM_ICBC.EXPERIMENT(IDEXPERIMENT) 
+	                                                        ON DELETE NO ACTION 
+	                                                        ON UPDATE NO ACTION
+	                             ,CONSTRAINT IDINTERVAL FOREIGN KEY (IDINTERVAL) 
+	                                                     REFERENCES ATM_ICBC.INTERVAL(IDINTERVAL) 
+	                                                      ON DELETE NO ACTION 
+	                                                      ON UPDATE NO ACTION
+);
+--CREATE UNIQUE INDEX CONFIGURATION.IDEXPERIMENT_IDX
+--                 ON ATM_ICBC.CONFIGURATION (IDEXPERIMENT); --The unique index is disabled for data load and not used
+--CREATE UNIQUE INDEX CONFIGURATION.IDINTERVAL_IDX
+--                 ON ATM_ICBC.CONFIGURATION (IDINTERVAL); --The unique index is disabled for data load and not used
+
+-- Table Name: ATM_ICBC.RESULT
+-- Create table definitions for RESULT table which contains predicted and actual results for the model experiment for an asset
+CREATE TABLE ATM_ICBC.RESULT (
+	                       IDEXPERIMENT       INT       NOT NULL
+	                      ,IDASSET            INT       NOT NULL
+	                      ,ACTUAL             DOUBLE    NOT NULL
+	                      ,PREDICTED          DOUBLE    NOT NULL
+);
+--CREATE UNIQUE INDEX RESULT.IDEXPERIMENT_IDX 
+--                 ON ATM_ICBC.RESULT (IDEXPERIMENT); --The unique index is disabled for data load and not used
+
+-- Table Name: ATM_ICBC.DATASET
+-- Create table definitions for DATASET table which contains information of experiments for assets. 
+-- This is not populated for ICBC unified schema as of now
+CREATE TABLE ATM_ICBC.DATASET (
+	                        IDEXPERIMENT      INT   NOT NULL
+	                       ,IDASSET           INT   NOT NULL
+	                       ,CONSTRAINT IDEXPERIMENT FOREIGN KEY (IDEXPERIMENT) 
+	                                                 REFERENCES ATM_ICBC.EXPERIMENT(IDEXPERIMENT) 
+	                                                  ON DELETE NO ACTION 
+	                                                  ON UPDATE NO ACTION
+);
+--CREATE UNIQUE INDEX DATASET.IDEXPERIMENT_IDX 
+--                 ON ATM_ICBC.DATASET (IDEXPERIMENT); --The unique index is disabled for data load and not used
+
+-- Table Name: ATM_ICBC.SELECTION
+-- Create table definitions for SELECTION table which contains features used in every experiments
+CREATE TABLE ATM_ICBC.SELECTION (
+	                          IDEXPERIMENT      INT   NOT NULL
+	                         ,IDFEATURE         INT   NOT NULL
+	                         ,CONSTRAINT IDEXPERIMENT FOREIGN KEY (IDEXPERIMENT) 
+	                                                   REFERENCES ATM_ICBC.EXPERIMENT(IDEXPERIMENT) 
+	                                                    ON DELETE NO ACTION 
+	                                                    ON UPDATE NO ACTION
+	                         ,CONSTRAINT IDFEATURE FOREIGN KEY (IDFEATURE) 
+	                                                REFERENCES ATM_ICBC.FEATURE(IDFEATURE) 
+	                                                 ON DELETE NO ACTION 
+	                                                 ON UPDATE NO ACTION
+);
+
+
