@@ -254,7 +254,7 @@ CREATE TABLE ATM_ICBC.TRANSACTION (
 	                           ,IDTTYPE            INT         NOT NULL
 	                           ,DATE               TIMESTAMP   NOT NULL            -- transaction date / timestamp
 	                           ,COUNT              INT         NULL                -- transaction count, can be NULL
-	                           ,VALUE              NUMERIC     NULL                -- transaction amount, can be NULL 
+	                           ,VALUE              NUMERIC     NOT NULL            -- transaction amount 
 	                           ,GRANULARITY        INT         NULL     DEFAULT 1  -- e.g. 1 for daily, 7 for weekly etc, for now : default 1 for transactions aggregated at daily level
 	                           ,PRIMARY KEY (IDTRANSACTION)
 --	                           ,CONSTRAINT IDASSET FOREIGN KEY (IDASSET)           -- remove constraint while data load
