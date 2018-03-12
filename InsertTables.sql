@@ -141,4 +141,45 @@ DROP TABLE ATM_ICBC.TAR_CODE_XREF;
 -- [Step7] Drop the view_ticket_temp as well which is no longer needed
 DROP VIEW ATM_ICBC.VIEW_TICKET_TEMP;
  
+---------------------------------------------------------------------------------------------------------------------
+-- Insert table scripts for Monitoring related information (STATUS, DISPOSITION, MONITORING)
+-- Disposition table is not loaded yet
+---------------------------------------------------------------------------------------------------------------------
+
+-- Insert script for Table: STATUS
+INSERT INTO ATM_ICBC.STATUS (STATUS, COMMENT)
+(SELECT ED.ERRCODE_BASE24, 
+        SUBSTR(ED.DESCRIPTION, 1, 100)
+   FROM BASE_ICBC.ERROR_DICTIONARY AS ED)
+   
+  UNION
+
+(SELECT ERR.ERR_CODE, 
+ 	NULL
+   FROM BASE_ICBC.ERRORS AS ERR
+  WHERE ERR.ERR_CODE NOT IN
+        (SELECT DISTINCT ED.ERRCODE_BASE24
+           FROM BASE_ICBC.ERROR_DICTIONARY AS ED));
+
+-- Insert script for Table: MONITORING
+-- Insert for specific date range: 2016-05-01 to 2018-01-31 (e.g. starting from May/2016 through January/2018)
+INSERT INTO ATM_ICBC.MONITORING (IDASSET, 
+				 --IDCOMPONENT,
+				 --IDDISPOSITION,
+				 IDSTATUS, 
+				 DATE, 
+				 SOURCE)
+WITH DATES (START_DATE, END_DATE) AS (VALUES ('2016-05-01', '2018-01-31'))
+SELECT A.IDASSET,
+       (SELECT DISTINCT S.IDSTATUS
+          FROM ATM_ICBC.STATUS AS S
+         WHERE S.STATUS = ERR.ERR_CODE), 
+       ERR.EVENT_TMS, 
+       NULL
+  FROM BASE_ICBC.ERRORS AS ERR 
+       INNER JOIN ATM_ICBC.ASSET AS A 
+               ON ERR.ATM_ID = A.IDORIGINAL 
+       INNER JOIN DATES 
+               ON ERR.EVENT_TMS BETWEEN DATES.START_DATE AND DATES.END_DATE;
+
 
