@@ -191,4 +191,75 @@ SELECT A.IDASSET,
        INNER JOIN DATES 
                ON ERR.EVENT_TMS BETWEEN DATES.START_DATE AND DATES.END_DATE;
 
+---------------------------------------------------------------------------------------------------------------------
+-- Insert table scripts for Transaction related information (TRANSACTION_TYPE, TRANSACTION)
+---------------------------------------------------------------------------------------------------------------------
+
+-- Insert script for Table: TRANSACTION_TYPE
+INSERT INTO ATM_ICBC.TRANSACTION_TYPE (TTYPE, COMMENT)
+SELECT TRX_MAP.TRANSACTION_TYPE, 
+       TRX_MAP.OPERATION
+  FROM NIKIFOR.TRX_MAPPING AS TRX_MAP;
+
+-- Insert script for Table: TRANSACTION
+-- [Step1] Intermediate view to capture aggregate data at "daily" level and consider reverse and successful transactions
+CREATE VIEW ATM_ICBC.VIEW_TRANSACTION_INTERMEDIATE AS
+SELECT * 
+  FROM (SELECT TRX.ATM_ID AS "ATMID", 
+               INV.IBM_SERIAL, 
+               date(TRX.TRANSACTION_TMS) AS "TRANSACTION_DATE", 
+               TM.OPERATION, 
+               SUM(CASE WHEN LEFT(TRX.REV_OPERATION, 1) = '*' THEN - 1 * TRX.AMOUNT 
+                        WHEN LEFT(TRX.RESP_CODE, 2) IN ('00', '01', '03') THEN TRX.AMOUNT 
+                        ELSE 0 
+                   END) AS "TRANSACTION_AMOUNT", 
+               SUM(CASE WHEN LEFT(TRX.REV_OPERATION, 1) = '*' THEN - 1 
+                        WHEN LEFT(TRX.RESP_CODE, 2) IN ('00', '01', '03') THEN 1 
+                        ELSE 0 
+                   END) AS "TRANSACTION_COUNT"
+          FROM ICBC.TRANSACTIONS AS TRX
+          INNER JOIN NIKIFOR.TRX_MAPPING AS TM 
+                  ON TRX.TRANSACTION_TYPE = TM.TRANSACTION_TYPE
+          INNER JOIN BASE_ICBC.INVENTORY INV 
+                  ON TRX.ATM_ID = INV.UNIQUE_ATM_ID 
+                 AND TRX.TRANSACTION_TMS BETWEEN INSTALLED_DATE AND value(DEINSTALLATION_DATE, CURRENT DATE)
+            GROUP BY TRX.ATM_ID, INV.IBM_SERIAL, date(TRX.TRANSACTION_TMS), TM.OPERATION
+       ) TRAN
+ WHERE TRAN.TRANSACTION_COUNT > 0;
+ 
+ -- [Step2] Actual load in to TRANSACTION table
+INSERT INTO ATM_ICBC.TRANSACTION (IDASSET, IDTTYPE, DATE, COUNT, VALUE, GRANULARITY)
+SELECT TRAN.IDASSET,
+       TRAN.IDTTYPE,
+       TRAN.TRANSACTION_DATE,
+       TRAN.TRANSACTION_COUNT,
+       TRAN.TRANSACTION_AMOUNT,
+       TRAN.GRANULARITY 
+  FROM (SELECT A.IDASSET AS "IDASSET",
+     	       TT.IDTTYPE AS "IDTTYPE",
+     	       date(TRX.TRANSACTION_TMS) AS "TRANSACTION_DATE", 
+     	       SUM(CASE WHEN LEFT(TRX.REV_OPERATION, 1) = '*' THEN - 1 
+     	                WHEN LEFT(TRX.RESP_CODE, 2) IN ('00', '01', '03') THEN 1 
+     	                ELSE 0 
+     	           END) AS "TRANSACTION_COUNT",
+     	       SUM(CASE WHEN LEFT(TRX.REV_OPERATION, 1) = '*' THEN - 1 * TRX.AMOUNT 
+     	                WHEN LEFT(TRX.RESP_CODE, 2) IN ('00', '01', '03') THEN TRX.AMOUNT 
+     	 		ELSE 0 
+     	 	   END) AS "TRANSACTION_AMOUNT",
+     	       1 AS "GRANULARITY"
+          FROM ICBC.TRANSACTIONS AS TRX
+     	       INNER JOIN NIKIFOR.TRX_MAPPING AS TM 
+     	               ON TRX.TRANSACTION_TYPE = TM.TRANSACTION_TYPE
+     	       INNER JOIN ATM_ICBC.TRANSACTION_TYPE AS TT 
+     	               ON TRX.TRANSACTION_TYPE = TT.TTYPE
+	       INNER JOIN ATM_ICBC.ASSET AS A 
+	 	       ON TRX.ATM_ID = A.IDORIGINAL
+     	       INNER JOIN BASE_ICBC.INVENTORY AS INV 
+     	               ON TRX.ATM_ID = INV.UNIQUE_ATM_ID 
+     	              AND TRX.TRANSACTION_TMS BETWEEN INSTALLED_DATE AND value(DEINSTALLATION_DATE, CURRENT DATE)
+                 GROUP BY TRX.ATM_ID, INV.IBM_SERIAL, A.IDASSET, TT.IDTTYPE, date(TRX.TRANSACTION_TMS), TM.OPERATION
+        ) TRAN
+ WHERE TRAN.TRANSACTION_COUNT > 0;
+
+
 
