@@ -195,14 +195,15 @@ SELECT A.IDASSET,
 -- Insert table scripts for Transaction related information (TRANSACTION_TYPE, TRANSACTION)
 ---------------------------------------------------------------------------------------------------------------------
 
--- Insert script for Table: TRANSACTION_TYPE
+-- Insert table script for Table: TRANSACTION_TYPE
 INSERT INTO ATM_ICBC.TRANSACTION_TYPE (TTYPE, COMMENT)
 SELECT TRX_MAP.TRANSACTION_TYPE, 
        TRX_MAP.OPERATION
   FROM NIKIFOR.TRX_MAPPING AS TRX_MAP;
 
--- Insert script for Table: TRANSACTION
--- [Step1] Create Intermediate View
+-- Insert table script for Table: TRANSACTION
+-- [Step1] Create Intermediate View 
+-- to aggregate "daily" transaction level information with granularity as 1
 CREATE VIEW ATM_ICBC.VIEW_TRANSACTION_INTERMEDIATE AS
 SELECT TRAN.ATMID,
        TRAN.IBM_SERIAL,
@@ -211,17 +212,17 @@ SELECT TRAN.ATMID,
        TRAN.TRANSACTION_AMOUNT,
        TRAN.TRANSACTION_COUNT 
   FROM (SELECT TRX.ATM_ID AS "ATMID",
-    	       INV.IBM_SERIAL, 
-    	       date(TRX.TRANSACTION_TMS) AS "TRANSACTION_DATE", 
-    	       TM.OPERATION,
-    	       SUM(CASE WHEN LEFT(TRX.REV_OPERATION, 1) = '*' THEN - 1 * TRX.AMOUNT 
-    		        WHEN LEFT(TRX.RESP_CODE, 2) IN ('00', '01', '03') THEN TRX.AMOUNT 
-    		        ELSE 0 
-    		   END) AS "TRANSACTION_AMOUNT", 
-    	       SUM(CASE WHEN LEFT(TRX.REV_OPERATION, 1) = '*' THEN - 1 
-    		        WHEN LEFT(TRX.RESP_CODE, 2) IN ('00', '01', '03') THEN 1 
-    		        ELSE 0 
-    		   END) AS "TRANSACTION_COUNT"
+    	        INV.IBM_SERIAL, 
+    	        date(TRX.TRANSACTION_TMS) AS "TRANSACTION_DATE", 
+    	        TM.OPERATION,
+    	        SUM(CASE WHEN LEFT(TRX.REV_OPERATION, 1) = '*' THEN - 1 * TRX.AMOUNT 
+    		         WHEN LEFT(TRX.RESP_CODE, 2) IN ('00', '01', '03') THEN TRX.AMOUNT 
+    		         ELSE 0 
+    		    END) AS "TRANSACTION_AMOUNT", 
+    	        SUM(CASE WHEN LEFT(TRX.REV_OPERATION, 1) = '*' THEN - 1 
+    		         WHEN LEFT(TRX.RESP_CODE, 2) IN ('00', '01', '03') THEN 1 
+    		         ELSE 0 
+    		    END) AS "TRANSACTION_COUNT"
           FROM ICBC.TRANSACTIONS AS TRX
                INNER JOIN NIKIFOR.TRX_MAPPING TM 
                        ON TRX.TRANSACTION_TYPE = TM.TRANSACTION_TYPE
@@ -233,6 +234,7 @@ SELECT TRAN.ATMID,
  WHERE TRAN.TRANSACTION_COUNT > 0;
 
 -- [Step2] Insert into Transaction table
+-- to include transaction type id and asset id from the current schema (IDASSET, IDTTYPE columns) while loading into transaction table
 INSERT INTO ATM_ICBC.TRANSACTION (IDASSET, IDTTYPE, DATE, COUNT, VALUE, GRANULARITY)
 SELECT A.IDASSET, 
        TT.IDTTYPE,
@@ -241,10 +243,11 @@ SELECT A.IDASSET,
        TRX.TRANSACTION_AMOUNT,
        1 AS "GRANULARITY"
   FROM ATM_ICBC.VIEW_TRANSACTION_INTERMEDIATE AS TRX
-	   INNER JOIN ATM_ICBC.ASSET AS A 
-	           ON TRX.ATMID = A.IDORIGINAL
-   	   INNER JOIN ATM_ICBC.TRANSACTION_TYPE AS TT 
-   	           ON TRX.OPERATION = TT.TTYPE 
+       INNER JOIN ATM_ICBC.ASSET AS A 
+               ON TRX.ATMID = A.IDORIGINAL
+       INNER JOIN ATM_ICBC.TRANSACTION_TYPE AS TT 
+               ON TRX.OPERATION = TT.TTYPE 
  WHERE date(TRX.TRANSACTION_DATE) >= '2017-11-01'; --Use a date post which transactions are required, here data is loaded from Nov/2017 onwards as an example
  
-
+ -- [Step3] Drop intermediate view, as it is no longer required
+DROP VIEW ATM_ICBC.VIEW_TRANSACTION_INTERMEDIATE;
