@@ -251,3 +251,78 @@ SELECT A.IDASSET,
  
  -- [Step3] Drop intermediate view, as it is no longer required
 DROP VIEW ATM_ICBC.VIEW_TRANSACTION_INTERMEDIATE;
+
+---------------------------------------------------------------------------------------------------------------------
+-- Insert table scripts for Result / Prediction related information (INTERVAL, FEATURE, EXPERIMENT, CONFIGURATION,
+-- DATASET, SELECTION, RESULT)
+-- FEATURE, DATASET, SELECTION tables are not yet loaded
+---------------------------------------------------------------------------------------------------------------------
+
+-- Insert table script for Table: INTERVAL
+INSERT INTO ATM_ICBC.INTERVAL (OBSERVE_FROM, OBSERVE_TO, PREDICT_FROM, PREDICT_TO)
+  SELECT (PR.PREDSTART - 35 days) AS "Observation_Start",
+         (PR.PREDSTART - 8 days) AS "Observation_End",
+         PR.PREDSTART AS "Prediction_Start",
+         PR.PREDEND AS "Prediction_End"
+    FROM BASE_ICBC.PREDICTION_RUN AS PR
+ORDER BY PR.RUNID ASC;
+
+
+-- Insert table script for Table: EXPERIMENT
+INSERT INTO ATM_ICBC.EXPERIMENT (PERFORMED, CUTOFF, RECALL, PRECISION, F1_SCORE)
+VALUES ('01-23-2018', 0.37, 0.57, 0.42, 0.48);
+
+
+-- Insert table script for Table: CONFIGURATION
+INSERT INTO ATM_ICBC.CONFIGURATION (IDEXPERIMENT, IDINTERVAL, COMPONENT)
+(SELECT DISTINCT 1, 
+                 I.IDINTERVAL, 
+                 'ATM' 
+   FROM ATM_ICBC.INTERVAL AS I)
+UNION
+(SELECT DISTINCT 1, 
+                 I.IDINTERVAL, 
+                 'Card Reader' 
+   FROM ATM_ICBC.INTERVAL AS I)
+UNION
+(SELECT DISTINCT 1, 
+                 I.IDINTERVAL, 
+                 'Receipt Printer' 
+   FROM ATM_ICBC.INTERVAL AS I)
+UNION
+(SELECT DISTINCT 1, 
+                 I.IDINTERVAL, 
+                 'Cash Dispenser' 
+   FROM ATM_ICBC.INTERVAL AS I)
+UNION
+(SELECT DISTINCT 1, 
+                 I.IDINTERVAL, 
+                 'Depositor' 
+   FROM ATM_ICBC.INTERVAL AS I)
+UNION
+(SELECT DISTINCT 1, 
+                 I.IDINTERVAL, 
+                 'Intelligent Depository Module IDP' 
+   FROM ATM_ICBC.INTERVAL AS I)
+UNION
+(SELECT DISTINCT 1, 
+                 I.IDINTERVAL, 
+                 'Recycler Module' 
+   FROM ATM_ICBC.INTERVAL AS I)
+;
+
+-- Insert table script for Table: RESULT
+INSERT INTO ATM_ICBC.RESULT (IDEXPERIMENT, IDASSET, ACTUAL, PREDICTED)
+SELECT DISTINCT P.PREDICTIONID,
+                A.IDASSET,
+                '0.40',  --sample value for testing
+                '0.45'  --sample value for testing
+  FROM BASE_ICBC.PREDICTIONS AS P 
+       LEFT JOIN BASE_ICBC.PREDICTION_RUN AS PR 
+	      ON PR.RUNID = P.RUNID
+       LEFT JOIN ATM_ICBC.INTERVAL AS I 
+              ON date(I.PREDICT_FROM) = date(PR.PREDSTART)
+       LEFT JOIN ATM_ICBC.ASSET AS A 
+              ON A.IDORIGINAL = P.ATMID
+           WHERE date(I.PREDICT_FROM) = '2018-01-30'; --data for Round17 for which Prediction Start date is 2018-01-30
+
