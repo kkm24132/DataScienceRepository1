@@ -29,7 +29,7 @@ tidyverse_cran_downloads %>%
 
 Daily Download Counts for TidyVerse package
 
-![plot of chunk DailyDownloadCount](/TidyVerseDailyDownloadCount.PNG)
+![plot of chunk TidyVerse DailyDownloadCount](/TidyVerseDailyDownloadCount.PNG)
 
 We want to determine which daily download “counts” are anomalous. 
 It’s as simple as using the 3 main functions (time_decompose(), anomalize(), and time_recompose()) 
@@ -51,6 +51,67 @@ tidyverse_cran_downloads %>%
 ```
 Anomalies for TidyVerse package (using STL and IQR methods)
 
-![plot of chunk DailyDownloadCount](/TidyVerseAnomalies.PNG)
+![plot of chunk TidyVerse Anomalies](/TidyVerseAnomalies.PNG)
+
+Twitter’s AnomalyDetection package: we can implement that method by combining time_decompose(method = "twitter") 
+with anomalize(method = "gesd"). Additionally, we’ll adjust the trend = "2 months" to adjust the median spans,
+which is how Twitter’s decomposition method works.
+
+```
+# Get only lubridate downloads
+lubridate_dloads <- tidyverse_cran_downloads %>%
+  filter(package == "lubridate") %>% 
+  ungroup()
+
+# Anomalize!!
+lubridate_dloads %>%
+  # Twitter + GESD
+  time_decompose(count, method = "twitter", trend = "2 months") %>%
+  anomalize(remainder, method = "gesd") %>%
+  time_recompose() %>%
+  # Anomaly Visualziation
+  plot_anomalies(time_recomposed = TRUE) +
+  labs(title = "Lubridate Anomalies", subtitle = "Twitter + GESD Methods")
+```
+
+Lubridate package Anomalies (using Twitter + GESD methods)
+
+![plot of chunk Lubridate Anomalies with GESD](/LubridateAnomalies_TwitterGESD.PNG)
+
+Finally, we can compare to STL + IQR methods, which use different decomposition and anomaly detection approaches.
+```
+lubridate_dloads %>%
+  # STL + IQR Anomaly Detection
+  time_decompose(count, method = "stl", trend = "2 months") %>%
+  anomalize(remainder, method = "iqr") %>%
+  time_recompose() %>%
+  # Anomaly Visualization
+  plot_anomalies(time_recomposed = TRUE) +
+  labs(title = "Lubridate Anomalies", subtitle = "STL + IQR Methods")
+```
+
+Lubridate package Anomalies (using STL + IQR methods)
+![plot of chunk Lubridate Anomalies with STL](/LubridateAnomalies_STLIQR.PNG)
 
 
+More capabilities for auto selection of frequency and trend...
+
+```
+# Time Frequency
+time_frequency(lubridate_dloads, period = "auto")
+
+# Time Trend
+time_trend(lubridate_dloads, period = "auto")
+
+# plot_anomaly_decomposition() for visualizing the inner workings of how algorithm detects anomalies in the “remainder”.
+tidyverse_cran_downloads %>%
+  filter(package == "lubridate") %>%
+  ungroup() %>%
+  time_decompose(count) %>%
+  anomalize(remainder) %>%
+  plot_anomaly_decomposition() +
+  labs(title = "Decomposition of Anomalized Lubridate Downloads")
+```
+
+Decomposition of Anomalized Lubridate Downloads
+![plot of chunk Anomalized Lubridate Downloads](/AnomalizedLubridateDownloads.PNG)
