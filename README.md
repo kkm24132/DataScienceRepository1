@@ -10,6 +10,9 @@ Author: Kamal
 
 
 * PCA Analysis using IRIS dataset
+![plot of chunk scatterplot3D](/PCA_Analysis1.PNG)
+
+
 * Anomaly Detction using anomalize packages
 
 Decomposition of Anomalized Lubridate Downloads
