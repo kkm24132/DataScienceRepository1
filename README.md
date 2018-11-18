@@ -1,12 +1,13 @@
-# DataScience_Repository1
-
-### Objective of this repository is to show case some innovative approaches on various Data Science Programming areas
-
 ---
 Title: "DataScience_Repository1"
 Output: Outcomes on multiple algorithms
 Author: Kamal
 ---
+
+# DataScience_Repository1
+
+### Objective of this repository is to show case some innovative approaches on various Data Science Programming areas
+
 
 * PCA Analysis using IRIS dataset
 * Anomaly Detction using anomalize packages
