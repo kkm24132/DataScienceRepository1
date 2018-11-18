@@ -27,6 +27,6 @@ tidyverse_cran_downloads %>%
        subtitle = "Data from CRAN by way of cranlogs package")
 ```
 
-![plot of chunk DailyDownloadCount](/TidyVerseDailyDownloadCount.png)
+![plot of chunk DailyDownloadCount](/TidyVerseDailyDownloadCount.PNG)
 
 
