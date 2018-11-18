@@ -27,6 +27,30 @@ tidyverse_cran_downloads %>%
        subtitle = "Data from CRAN by way of cranlogs package")
 ```
 
+Daily Download Counts for TidyVerse package
+
 ![plot of chunk DailyDownloadCount](/TidyVerseDailyDownloadCount.PNG)
+
+We want to determine which daily download “counts” are anomalous. 
+It’s as simple as using the 3 main functions (time_decompose(), anomalize(), and time_recompose()) 
+along with a visualization function, plot_anomalies()
+
+Anomalize() uses 2 techniques for seasonal decomposition
+* STL: Seasonal Decomposition of Time series by Loess - good for long term trend
+* Twitter: Seasonal Decomposition of Time series by Median - works well if seasonal component is more dominant
+
+```
+tidyverse_cran_downloads %>%
+  # Data Manipulation / Anomaly Detection
+  time_decompose(count, method = "stl") %>%
+  anomalize(remainder, method = "iqr") %>%
+  time_recompose() %>%
+  # Anomaly Visualization
+  plot_anomalies(time_recomposed = TRUE, ncol = 3, alpha_dots = 0.25) +
+  labs(title = "Tidyverse Anomalies", subtitle = "STL + IQR Methods") 
+```
+Anomalies for TidyVerse package (using STL and IQR methods)
+
+![plot of chunk DailyDownloadCount](/TidyVerseAnomalies.PNG)
 
 
