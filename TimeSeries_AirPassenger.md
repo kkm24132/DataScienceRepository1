@@ -32,3 +32,11 @@ plot(aggregate(AirPassengers,FUN=mean)) #This will aggregate the cycles and disp
 boxplot(AirPassengers~cycle(AirPassengers)) #Box plot across months will give us a sense on seasonal effect
 ```
 ![plot of chunk AirPassenger data](/figures/Timeseries_AirPassenger1.PNG)
+
+![plot of chunk AirPassenger data](/figures/Timeseries_AirPassenger2.PNG)
+
+![plot of chunk AirPassenger data](/figures/Timeseries_AirPassenger3.PNG)
+
+![plot of chunk AirPassenger data](/figures/Timeseries_AirPassenger4.PNG)
+
+![plot of chunk AirPassenger data](/figures/Timeseries_AirPassenger5.PNG)
