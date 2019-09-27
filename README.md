@@ -4,7 +4,7 @@ Output: Outcomes on multiple algorithms
 Author: Kamal
 ---
 
-# DataScience_Repository1
+# DataScience Repository
 
 ### Objective of this repository is to show case some innovative approaches on various Data Science Programming areas and provide learning content references.
 
@@ -21,14 +21,20 @@ Decomposition of Anomalized Lubridate Downloads
 
 Please refer to respective files for details on the analysis, code snippet and outputs from experiments on kernels.
 
-## GitHub References for R
+## GitHub References for R (not exhaustive though..)
 
 * [H2O for R](https://github.com/h2oai/h2o-3/tree/master/h2o-r/demos) - H2O has been helping automating machine learning, reduce computational time, hence it may be relevant in mastering this powerful package. The repository contains practical examples (airlines delay, bad loans, citibike demand) using which you can explore various h2o features in model building.
 * [Data Science in R](https://github.com/ujjwalkarn/DataScienceR) - The repository takes you deeper into specifics of model building in R. It consists several areas around most phases in CRISP-DM such as data exploration, data manipulation, modeling using time series analysis and others etc.
 
+## GitHub References for Python (not exhaustive though..)
+
+* [Awesome ML in Python](https://github.com/josephmisiti/awesome-machine-learning#python) - As evident by its name, this repository enlists all the useful tutorials on doing machine learning, computer vision, natural language processing (NLP) in python. This definitely provides some interesting learning aspects with the evolution of this space in a rapid manner.
+* [Ipython Notebooks](https://github.com/donnemartin/data-science-ipython-notebooks) - This repository contains ipython notebooks on ML algorithms (scikit learn) by solving various problems including titanic kaggle. Moreover, it also contains tensor flow notebooks to build scalable ML models in python. The focus of this repository is kept on exploring broad aspect of python in machine learning.
+* [Data Science in Python](https://github.com/ujjwalkarn/DataSciencePython#data-science-with-python) - This repository consists of ML algorithms wise (neural network, decision trees, linear regression etc) list of tutorials to give you a clear view of how an algorithm works. Also, it introduces you to most common tasks in data manipulations and how to do them in python.
 
 ## What is Data Science?
 
+* [Tensorflow Examples](https://github.com/aymericdamien/TensorFlow-Examples)
 * [What is Data Science @ O'reilly](https://www.oreilly.com/ideas/what-is-data-science)
 * [What is Data Science @ Quora](https://www.quora.com/Data-Science/What-is-data-science)
 * [The sexiest job of 21st century](https://hbr.org/2012/10/data-scientist-the-sexiest-job-of-the-21st-century)
