@@ -21,6 +21,12 @@ Decomposition of Anomalized Lubridate Downloads
 
 Please refer to respective files for details on the analysis, code snippet and outputs from experiments on kernels.
 
+## GitHub References for R
+
+* [H2O for R](https://github.com/h2oai/h2o-3/tree/master/h2o-r/demos) - H2O has been helping automating machine learning, reduce computational time, hence it may be relevant in mastering this powerful package. The repository contains practical examples (airlines delay, bad loans, citibike demand) using which you can explore various h2o features in model building.
+* [Data Science in R](https://github.com/ujjwalkarn/DataScienceR) - The repository takes you deeper into specifics of model building in R. It consists several areas around most phases in CRISP-DM such as data exploration, data manipulation, modeling using time series analysis and others etc.
+
+
 ## What is Data Science?
 
 * [What is Data Science @ O'reilly](https://www.oreilly.com/ideas/what-is-data-science)
