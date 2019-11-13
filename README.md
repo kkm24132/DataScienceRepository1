@@ -91,6 +91,6 @@ Please refer to respective files for details on the analysis, code snippet and o
 ## Additional References
 
 * [GitHub around Explain BlackBox ML - Interpretability](https://github.com/interpretml/interpret)
-* [Application of Deep Neural Net from Prof Jeff heaton's GitHub reference](https://github.com/interpretml/interpret)
+* [Application of Deep Neural Net from Prof Jeff heaton's GitHub reference](https://github.com/jeffheaton/t81_558_deep_learning)
 
 
