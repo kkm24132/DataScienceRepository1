@@ -87,3 +87,10 @@ Please refer to respective files for details on the analysis, code snippet and o
 * [Udacity - Deep Learning](https://www.udacity.com/course/deep-learning--ud730)
 * [Keras in Motion](https://www.manning.com/livevideo/keras-in-motion) 
 * [Microsoft Professional Program for Data Science](https://academy.microsoft.com/en-us/professional-program/tracks/data-science/)
+
+## Additional References
+
+* [GitHub around Explain BlackBox ML - Interpretability](https://github.com/interpretml/interpret)
+* [Application of Deep Neural Net from Prof Jeff heaton's GitHub reference](https://github.com/interpretml/interpret)
+
+
