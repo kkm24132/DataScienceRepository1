@@ -1,7 +1,7 @@
 ---
 Title: "DataScience_Repository1"
 Output: Outcomes on multiple algorithms
-Author: Kamal
+Author: Kamal Mishra
 ---
 
 # DataScience Repository
