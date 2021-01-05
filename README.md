@@ -21,12 +21,12 @@ Decomposition of Anomalized Lubridate Downloads
 
 Please refer to respective files for details on the analysis, code snippet and outputs from experiments on kernels.
 
-## GitHub References for R (not exhaustive though..)
+## GitHub References for R (Non-Exhaustive)
 
 * [H2O for R](https://github.com/h2oai/h2o-3/tree/master/h2o-r/demos) - H2O has been helping automating machine learning, reduce computational time, hence it may be relevant in mastering this powerful package. The repository contains practical examples (airlines delay, bad loans, citibike demand) using which you can explore various h2o features in model building.
 * [Data Science in R](https://github.com/ujjwalkarn/DataScienceR) - The repository takes you deeper into specifics of model building in R. It consists several areas around most phases in CRISP-DM such as data exploration, data manipulation, modeling using time series analysis and others etc.
 
-## GitHub References for Python (not exhaustive though..)
+## GitHub References for Python (Non-Exhaustive)
 
 * [Awesome ML in Python](https://github.com/josephmisiti/awesome-machine-learning#python) - As evident by its name, this repository enlists all the useful tutorials on doing machine learning, computer vision, natural language processing (NLP) in python. This definitely provides some interesting learning aspects with the evolution of this space in a rapid manner.
 * [Ipython Notebooks](https://github.com/donnemartin/data-science-ipython-notebooks) - This repository contains ipython notebooks on ML algorithms (scikit learn) by solving various problems including titanic kaggle. Moreover, it also contains tensor flow notebooks to build scalable ML models in python. The focus of this repository is kept on exploring broad aspect of python in machine learning.
