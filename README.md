@@ -6,7 +6,7 @@ Author: Kamal Mishra
 
 # DataScience Repository
 
-### Objective: is to show case some innovative approaches on various Data Science Programming areas and provide learning content references.
+**Objective: is to show case some innovative approaches on various Data Science Programming areas and provide learning content references.**
 
 
 * PCA Analysis using IRIS dataset
