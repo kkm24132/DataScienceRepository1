@@ -9,7 +9,7 @@ Author: Kamal Mishra
 **Objective: is to show case some innovative approaches on various Data Science Programming areas and provide learning content references.**
 
 
-* PCA Analysis using IRIS dataset
+* PCA Analysis using typical sample IRIS dataset
 ![plot of chunk scatterplot3D](/PCA_Analysis1.PNG)
 
 
