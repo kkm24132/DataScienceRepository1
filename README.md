@@ -15,7 +15,7 @@ Author: Kamal Mishra
 
 * Anomaly Detction using anomalize packages
 
-Decomposition of Anomalized Lubridate Downloads
+#### Decomposition of Anomalized Lubridate Downloads
 ![plot of chunk Anomalized Lubridate Downloads](/AnomalizedLubridateDownloads.PNG)
 
 
